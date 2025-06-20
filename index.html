@@ -1,0 +1,863 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Real-time public transport remind website</title>
+    <meta charset="utf-8" />
+
+    <link href="./css/layui.css" rel="stylesheet" />
+
+    <style type="text/css">
+        html {
+            height: 100%
+        }
+
+        body {
+            height: 100%;
+            margin: 0px;
+            padding: 0px
+        }
+
+        #container {
+    position: absolute;  /* 确保元素有定位 */
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;  /* 将地图放置在底部 */
+}
+    </style>
+    <script src="https://api.map.baidu.com/api?v=1.0&&type=webgl&ak=NubLAXGkfLvLcPWDPqfhA43d57tXlspx"></script>
+    <script src="./js/jquery-1.12.1.min.js"></script>
+    <script src="./js/layui.js"></script>
+    <link rel="stylesheet" href="./css/project.css">
+    <link rel="stylesheet" href="./css/project-p3.css">
+    <link rel="stylesheet" href="./css/project-p4.css">
+    <link rel="stylesheet" href="./css/project-p5.css">
+
+</head>
+<body scroll="no">
+  <div id="container"></div>
+
+  <script>
+      var map = new BMapGL.Map("container");
+      var point = new BMapGL.Point(60.6057, 56.8389);
+      map.centerAndZoom(point, 15);
+
+      map.enableScrollWheelZoom(true); //开启鼠标滚轮 地图可以进行放大 缩小
+        map.addControl(new BMapGL.ScaleControl()); // 添加比例尺控件 左下角显示
+        map.addControl(new BMapGL.ZoomControl());// 添加缩放控件 右下角显示
+       // map.addControl(new BMapGL.CityListControl());  // 添加城市列表控件 左上角
+       // map.addControl(new BMapGL.MapTypeControl());// 地图类型 右上角显示
+  </script>
+
+    <div id="destination-search" class="destination-search">
+        <div class="search-container">
+            <div id="iptbox">
+                <div id="scanbtn1" class="scanbtn">
+                    <img class="searchlogo" src="./img2/search.png" alt="scan" >
+                </div>
+                <input type="text" placeholder="Look for your destination" maxlength="1024">
+                <div id="scanbtn2" class="scanbtn">
+                    <img class="scanlogo" src="./img2/扫描 (1).png" alt="scan" >
+                </div>
+                <div id="micbtn" class="micbtn">
+                    <img class="miclogo" src="./img2/麦克风开 (2).png" alt="mic" >
+                </div>
+            </div>
+        </div>
+     </div>
+    <!-- Home 页面 -->
+    <div id="homePage" class="page-content active">
+ 
+    </div>
+
+    <!-- Information 页面 -->
+    <div id="infoPage" class="page-content" style="display:none;">
+        <section class="info-container">
+            <div class="info-wrapper">
+              <!-- 有轨电车信息卡片 -->
+              <article class="info-card">
+                <div class="info-header">
+                    <div class="header-left">
+                        <img loading="lazy" src="./img2/有轨电车.png" class="icon-medium" alt="Tram" />
+                        <h3>Tram Network Status</h3>
+                    </div>
+                    <span class="status-badge operational">All Lines Operating</span>
+                </div>
+
+                <!-- 线路信息 -->
+                <div class="route-info">
+                    <!-- T5线路 -->
+                    <div class="route-item">
+                        <div class="route-header">
+                            <div class="route-title">
+                                <span class="route-number">T5</span>
+                                <span class="route-status active">Active</span>
+                            </div>
+                            <div class="passenger-info">
+                                <span class="passenger-count">Current Load: 65%</span>
+                                <div class="capacity-bar">
+                                    <div class="capacity-fill" style="width: 65%"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="route-path">West Mall → Central Station → East Station</div>
+                        <div class="route-details">
+                            <div class="detail-item">
+                                <span class="detail-label">Next Arrival:</span>
+                                <span class="detail-value">3 min</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Frequency:</span>
+                                <span class="detail-value">Every 8 min</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Operating Cars:</span>
+                                <span class="detail-value">4/5</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- T3线路 -->
+                    <div class="route-item">
+                        <div class="route-header">
+                            <div class="route-title">
+                                <span class="route-number">T3</span>
+                                <span class="route-status active">Active</span>
+                            </div>
+                            <div class="passenger-info">
+                                <span class="passenger-count">Current Load: 45%</span>
+                                <div class="capacity-bar">
+                                    <div class="capacity-fill" style="width: 45%"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="route-path">North Square → City Center → South Terminal</div>
+                        <div class="route-details">
+                            <div class="detail-item">
+                                <span class="detail-label">Next Arrival:</span>
+                                <span class="detail-value">5 min</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Frequency:</span>
+                                <span class="detail-value">Every 10 min</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Operating Cars:</span>
+                                <span class="detail-value">3/4</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+              </article>
+
+              <!-- 系统状态卡片 -->
+              <article class="info-card-secondary">
+                <div class="info-header">
+                    <h3>System Overview</h3>
+                    <span class="update-time">Last Updated: 2 min ago</span>
+                </div>
+                <div class="system-stats">
+                    <div class="stats-grid">
+                        <div class="stat-box">
+                            <span class="stat-label">Total Passengers Today</span>
+                            <span class="stat-value">12,458</span>
+                            <span class="stat-trend positive">↑ 8% vs. yesterday</span>
+                        </div>
+                        <div class="stat-box">
+                            <span class="stat-label">Average Wait Time</span>
+                            <span class="stat-value">4.5 min</span>
+                            <span class="stat-trend positive">↓ 0.5 min</span>
+                        </div>
+                        <div class="stat-box">
+                            <span class="stat-label">On-Time Performance</span>
+                            <span class="stat-value">96%</span>
+                            <span class="stat-trend positive">↑ 2%</span>
+                        </div>
+                        <div class="stat-box">
+                            <span class="stat-label">Operating Trams</span>
+                            <span class="stat-value">7/9</span>
+                            <span class="stat-trend neutral">Normal</span>
+                        </div>
+                    </div>
+                </div>
+              </article>
+
+              <!-- 实时更新卡片 -->
+              <article class="info-card-tertiary">
+                <div class="info-header">
+                    <h3>Live Updates</h3>
+                </div>
+                <div class="updates-list">
+                    <div class="update-item">
+                        <span class="update-time">10:30 AM</span>
+                        <div class="update-content">
+                            <span class="update-title">T5 Line: Peak Hours Adjustment</span>
+                            <p class="update-text">Additional tram deployed to handle morning rush. Frequency increased to every 6 minutes.</p>
+                        </div>
+                    </div>
+                    <div class="update-item">
+                        <span class="update-time">09:15 AM</span>
+                        <div class="update-content">
+                            <span class="update-title">T3 Line: Station Maintenance</span>
+                            <p class="update-text">Brief 2-minute stops at Central Station due to routine platform inspection.</p>
+                        </div>
+                    </div>
+                </div>
+              </article>
+            </div>
+          </section>
+    </div>
+
+    <!-- Message 页面 -->
+    <div id="messagePage" class="page-content">
+        <div class="messages-container">
+            <div class="chat-section">
+              <div class="chat-container">
+                <div class="avatar-column">
+                  <img
+                    loading="lazy"
+                    src="./img2/android-bus.png"
+                    class="chat-avatar"
+                    alt="Bus Service"
+                  />
+                </div>
+                <div class="content-column">
+                  <div class="message-wrapper1">
+                    <div class="message-title">Bus Service Alert</div>
+                    <div class="message-subtitle">Route 123: Arriving in 5 minutes at Central Station</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="chat-section">
+              <div class="chat-container">
+                <div class="avatar-column">
+                  <img
+                    loading="lazy"
+                    src="./img2/有轨电车.png"
+                    class="chat-avatar"
+                    alt="Tram Service"
+                  />
+                </div>
+                <div class="content-column">
+                  <div class="message-wrapper1">
+                    <div class="message-title">Tram Service Update</div>
+                    <div class="message-subtitle">Line T5: Schedule change on weekends starting next week</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="chat-section">
+              <div class="chat-container">
+                <div class="avatar-column">
+                  <img
+                    loading="lazy"
+                    src="./img2/客服.png"
+                    class="chat-avatar"
+                    alt="Customer Service"
+                  />
+                </div>
+                <div class="content-column">
+                  <div class="message-wrapper1">
+                    <div class="message-title">Customer Support</div>
+                    <div class="message-subtitle">Thank you for your feedback. How else can we help?</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+    </div>
+
+    <!-- Favorite 页面 -->
+    <div id="favoritePage" class="page-content">
+      <div class="favorites-container">
+        <!-- Bus Item -->
+        <div class="favorite-item">
+          <div class="favorite-item-left">
+            <div class="transport-icon bus">
+              <img loading="lazy" src="./img2/android-bus.png" alt="Bus"/>
+              <span class="notification-badge">22</span>
+            </div>
+            <div class="transport-info">
+              <div class="route-number">#123</div>
+              <div class="route-name">Central Station - Airport</div>
+              <div class="schedule-info">
+                <span class="next-arrival">Next: 5 min</span>
+                <span class="frequency">Every 10 min</span>
+              </div>
+            </div>
+          </div>
+          <div class="favorite-item-right">
+            <div class="favorite-actions">
+              <button class="star-btn active">
+                <img src="./img2/Star 1 (1).png" alt="Favorite"/>
+              </button>
+              <button class="notification-btn">
+                <img src="./img2/提示 (1).png" alt="Notifications"/>
+              </button>
+            </div>
+            <div class="update-time">Updated 2 min ago</div>
+          </div>
+        </div>
+
+        <!-- Tram Item -->
+        <div class="favorite-item">
+          <div class="favorite-item-left">
+            <div class="transport-icon tram">
+              <img loading="lazy" src="./img2/有轨电车.png" alt="Tram"/>
+              <span class="notification-badge">76</span>
+            </div>
+            <div class="transport-info">
+              <div class="route-number">#T5</div>
+              <div class="route-name">West Mall - East Station</div>
+              <div class="schedule-info">
+                <span class="next-arrival">Next: 3 min</span>
+                <span class="frequency">Every 8 min</span>
+              </div>
+            </div>
+          </div>
+          <div class="favorite-item-right">
+            <div class="favorite-actions">
+              <button class="star-btn active">
+                <img src="./img2/Star 1 (1).png" alt="Favorite"/>
+              </button>
+              <button class="notification-btn">
+                <img src="./img2/提示 (1).png" alt="Notifications"/>
+              </button>
+            </div>
+            <div class="update-time">Updated 1 min ago</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mine 页面 -->
+    <div id="minePage" class="page-content" style="display:none;">
+        <div class="mine-container">
+            <!-- 用户信息部分 -->
+            <div class="user-profile">
+                <div class="profile-header">
+                    <img src="./img2/KHCFDC_头像 2.png" alt="user" class="profile-avatar">
+                    <div class="profile-info">
+                        <h2 class="profile-name">John Doe</h2>
+                        <p class="profile-email">john.doe@example.com</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 功能菜单部分 -->
+            <div class="menu-section">
+                <!-- 常用功能 -->
+                <div class="menu-group">
+                    <h3 class="menu-title">General</h3>
+                    <div class="menu-items">
+                        <button class="menu-item" onclick="showSubPage('settingsPage')">
+                            <img src="./img2/设置.png" alt="Settings" class="menu-icon">
+                            <span>Settings</span>
+                            <img src="./img2/右箭头.png" alt="arrow" class="arrow-icon">
+                        </button>
+                        <button class="menu-item" onclick="showSubPage('supportPage')">
+                            <img src="./img2/客服.png" alt="Support" class="menu-icon">
+                            <span>Customer Service</span>
+                            <img src="./img2/右箭头.png" alt="arrow" class="arrow-icon">
+                        </button>
+                        <button class="menu-item" onclick="showSubPage('notificationsPage')">
+                            <img src="./img2/提示 (1).png" alt="Notifications" class="menu-icon">
+                            <span>Notifications</span>
+                            <img src="./img2/右箭头.png" alt="arrow" class="arrow-icon">
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 交通相关 -->
+                <div class="menu-group">
+                    <h3 class="menu-title">Transport</h3>
+                    <div class="menu-items">
+                        <button class="menu-item" onclick="showSubPage('scheduleAlertPage')">
+                            <img src="./img2/闹钟.png" alt="Schedule" class="menu-icon">
+                            <span>Schedule Alerts</span>
+                            <img src="./img2/右箭头.png" alt="arrow" class="arrow-icon">
+                        </button>
+                        <button class="menu-item" onclick="showSubPage('travelStatsPage')">
+                            <img src="./img2/统计.png" alt="Stats" class="menu-icon">
+                            <span>Travel Statistics</span>
+                            <img src="./img2/右箭头.png" alt="arrow" class="arrow-icon">
+                        </button>
+                        <button class="menu-item" onclick="showSubPage('historyPage')">
+                            <img src="./img2/历史记录.png" alt="History" class="menu-icon">
+                            <span>Travel History</span>
+                            <img src="./img2/右箭头.png" alt="arrow" class="arrow-icon">
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 其他设置 -->
+                <div class="menu-group">
+                    <h3 class="menu-title">Other</h3>
+                    <div class="menu-items">
+                        <button class="menu-item" onclick="showSubPage('aboutPage')">
+                            <img src="./img2/info.png" alt="About" class="menu-icon">
+                            <span>About Us</span>
+                            <img src="./img2/右箭头.png" alt="arrow" class="arrow-icon">
+                        </button>
+                        <button class="menu-item logout" onclick="showSubPage('logoutPage')">
+                            <img src="./img2/退出.png" alt="Logout" class="menu-icon">
+                            <span>Log Out</span>
+                            <img src="./img2/右箭头.png" alt="arrow" class="arrow-icon">
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mine子页面 -->
+    <div id="settingsPage" class="sub-page">
+        <div class="sub-page-header">
+            <button class="back-btn" onclick="hideSubPage('settingsPage')">
+                <img src="./img2/左箭头.png" alt="Back" class="back-icon">
+            </button>
+            <h2>Settings</h2>
+        </div>
+        <div class="settings-content">
+            <div class="settings-group">
+                <h3>Account Settings</h3>
+                <div class="setting-item">
+                    <span>Profile Information</span>
+                    <img src="./img2/右箭头.png" alt="arrow" class="arrow-icon">
+                </div>
+                <div class="setting-item">
+                    <span>Password & Security</span>
+                    <img src="./img2/右箭头.png" alt="arrow" class="arrow-icon">
+                </div>
+            </div>
+            <div class="settings-group">
+                <h3>Preferences</h3>
+                <div class="setting-item">
+                    <span>Language</span>
+                    <select class="setting-select">
+                        <option>English</option>
+                        <option>中文</option>
+                    </select>
+                </div>
+                <div class="setting-item">
+                    <span>Dark Mode</span>
+                    <label class="switch">
+                        <input type="checkbox">
+                        <span class="slider round"></span>
+                    </label>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="supportPage" class="sub-page">
+        <div class="sub-page-header">
+            <button class="back-btn" onclick="hideSubPage('supportPage')">
+                <img src="./img2/左箭头.png" alt="Back" class="back-icon">
+            </button>
+            <h2>Customer Service</h2>
+        </div>
+        <div class="support-content">
+            <div class="support-options">
+                <div class="support-card">
+                    <img src="./img2/客服.png" alt="Chat" class="support-icon">
+                    <h3>Live Chat</h3>
+                    <p>Chat with our support team</p>
+                    <button class="support-btn">Start Chat</button>
+                </div>
+                <div class="support-card">
+                    <img src="./img2/电话.png" alt="Call" class="support-icon">
+                    <h3>Call Us</h3>
+                    <p>24/7 Support Line</p>
+                    <button class="support-btn">Call Now</button>
+                </div>
+            </div>
+            <div class="faq-section">
+                <h3>Frequently Asked Questions</h3>
+                <div class="faq-item">
+                    <div class="faq-question">How to set up route alerts?</div>
+                    <div class="faq-answer">Click on any route and tap the bell icon to set up alerts.</div>
+                </div>
+                <div class="faq-item">
+                    <div class="faq-question">How to report an issue?</div>
+                    <div class="faq-answer">Use the Live Chat feature or call our support line.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="notificationsPage" class="sub-page">
+        <div class="sub-page-header">
+            <button class="back-btn" onclick="hideSubPage('notificationsPage')">
+                <img src="./img2/左箭头.png" alt="Back" class="back-icon">
+            </button>
+            <h2>Notifications</h2>
+        </div>
+        <div class="notifications-content">
+            <div class="notification-filters">
+                <button class="filter-btn active">All</button>
+                <button class="filter-btn">Alerts</button>
+                <button class="filter-btn">Updates</button>
+            </div>
+            <div class="notifications-list">
+                <div class="notification-item">
+                    <div class="notification-icon alert">
+                        <img src="./img2/提示 (1).png" alt="Alert">
+                    </div>
+                    <div class="notification-details">
+                        <div class="notification-title">Route Delay Alert</div>
+                        <div class="notification-message">Bus #123 is delayed by 10 minutes</div>
+                        <div class="notification-time">2 minutes ago</div>
+                    </div>
+                </div>
+                <div class="notification-item">
+                    <div class="notification-icon update">
+                        <img src="./img2/更新.png" alt="Update">
+                    </div>
+                    <div class="notification-details">
+                        <div class="notification-title">Schedule Update</div>
+                        <div class="notification-message">New weekend schedule available</div>
+                        <div class="notification-time">1 hour ago</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="scheduleAlertPage" class="sub-page">
+        <div class="sub-page-header">
+            <button class="back-btn" onclick="hideSubPage('scheduleAlertPage')">
+                <img src="./img2/左箭头.png" alt="Back" class="back-icon">
+            </button>
+            <h2>Schedule Alerts</h2>
+        </div>
+        <div class="schedule-content">
+            <div class="alert-settings">
+                <div class="alert-item">
+                    <div class="alert-header">
+                        <span>Morning Commute</span>
+                        <label class="switch">
+                            <input type="checkbox" checked>
+                            <span class="slider round"></span>
+                        </label>
+                    </div>
+                    <div class="alert-details">
+                        <p>Bus #123 - 8:00 AM</p>
+                        <p>Alert: 15 minutes before</p>
+                    </div>
+                </div>
+                <div class="alert-item">
+                    <div class="alert-header">
+                        <span>Evening Return</span>
+                        <label class="switch">
+                            <input type="checkbox" checked>
+                            <span class="slider round"></span>
+                        </label>
+                    </div>
+                    <div class="alert-details">
+                        <p>Tram #T5 - 6:00 PM</p>
+                        <p>Alert: 10 minutes before</p>
+                    </div>
+                </div>
+            </div>
+            <button class="add-alert-btn">
+                <img src="./img2/加.png" alt="Add" class="add-icon">
+                Add New Alert
+            </button>
+        </div>
+    </div>
+
+    <div id="travelStatsPage" class="sub-page">
+        <div class="sub-page-header">
+            <button class="back-btn" onclick="hideSubPage('travelStatsPage')">
+                <img src="./img2/左箭头.png" alt="Back" class="back-icon">
+            </button>
+            <h2>Travel Statistics</h2>
+        </div>
+        <div class="stats-content">
+            <div class="stats-summary">
+                <div class="stat-card">
+                    <h3>Total Trips</h3>
+                    <div class="stat-value">247</div>
+                    <div class="stat-change">+12% this month</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Distance</h3>
+                    <div class="stat-value">1,234 km</div>
+                    <div class="stat-change">+5% this month</div>
+                </div>
+            </div>
+            <div class="stats-chart">
+                <h3>Monthly Usage</h3>
+                <div class="chart-placeholder">
+                    <!-- Chart will be added here -->
+                </div>
+            </div>
+            <div class="transport-breakdown">
+                <h3>Transport Type Usage</h3>
+                <div class="breakdown-item">
+                    <span>Bus</span>
+                    <div class="progress-bar">
+                        <div class="progress" style="width: 65%"></div>
+                    </div>
+                    <span>65%</span>
+                </div>
+                <div class="breakdown-item">
+                    <span>Tram</span>
+                    <div class="progress-bar">
+                        <div class="progress" style="width: 35%"></div>
+                    </div>
+                    <span>35%</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="historyPage" class="sub-page">
+        <div class="sub-page-header">
+            <button class="back-btn" onclick="hideSubPage('historyPage')">
+                <img src="./img2/左箭头.png" alt="Back" class="back-icon">
+            </button>
+            <h2>Travel History</h2>
+        </div>
+        <div class="history-content">
+            <div class="history-filters">
+                <select class="history-select">
+                    <option>Last 7 Days</option>
+                    <option>Last 30 Days</option>
+                    <option>Last 3 Months</option>
+                </select>
+            </div>
+            <div class="history-list">
+                <div class="history-item">
+                    <div class="history-icon">
+                        <img src="./img2/android-bus.png" alt="Bus">
+                    </div>
+                    <div class="history-details">
+                        <div class="history-route">Bus #123</div>
+                        <div class="history-destination">Central Station → Airport</div>
+                        <div class="history-time">Today, 9:30 AM</div>
+                    </div>
+                    <div class="history-status completed">Completed</div>
+                </div>
+                <div class="history-item">
+                    <div class="history-icon">
+                        <img src="./img2/有轨电车.png" alt="Tram">
+                    </div>
+                    <div class="history-details">
+                        <div class="history-route">Tram #T5</div>
+                        <div class="history-destination">West Mall → East Station</div>
+                        <div class="history-time">Yesterday, 6:15 PM</div>
+                    </div>
+                    <div class="history-status completed">Completed</div>
+                </div>
+            </div>
+          </div>
+        </div>
+
+    <div id="aboutPage" class="sub-page">
+        <div class="sub-page-header">
+            <button class="back-btn" onclick="hideSubPage('aboutPage')">
+                <img src="./img2/左箭头.png" alt="Back" class="back-icon">
+            </button>
+            <h2>About Us</h2>
+        </div>
+        <div class="about-content">
+            <div class="about-logo">
+                <img src="./img2/android-bus.png" alt="Logo">
+            </div>
+            <h3>Real-time Transport v1.0.0</h3>
+            <p class="about-description">
+                Your trusted companion for public transport navigation. We provide real-time updates
+                and personalized travel information to make your journey smoother.
+            </p>
+            <div class="about-links">
+                <a href="#" class="about-link">Privacy Policy</a>
+                <a href="#" class="about-link">Terms of Service</a>
+                <a href="#" class="about-link">Contact Us</a>
+            </div>
+            <div class="social-links">
+                <a href="#" class="social-link">
+                    <img src="./img2/facebook.png" alt="Facebook">
+                </a>
+                <a href="#" class="social-link">
+                    <img src="./img2/X-logo.png" alt="Twitter">
+                </a>
+                <a href="#" class="social-link">
+                    <img src="./img2/instagram.png" alt="Instagram">
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div id="logoutPage" class="sub-page">
+        <div class="sub-page-header">
+            <button class="back-btn" onclick="hideSubPage('logoutPage')">
+                <img src="./img2/左箭头.png" alt="Back" class="back-icon">
+            </button>
+            <h2>Log Out</h2>
+        </div>
+        <div class="logout-content">
+            <div class="logout-icon">
+                <img src="./img2/退出.png" alt="Logout">
+            </div>
+            <h3>Are you sure you want to log out?</h3>
+            <p>You will need to log in again to access your account.</p>
+            <div class="logout-buttons">
+                <button class="cancel-btn" onclick="hideSubPage('logoutPage')">Cancel</button>
+                <button class="confirm-btn">Log Out</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="results-container">  
+        <div class="result-card">
+            <div class="result-details">
+                <button style="background: transparent; border: none; padding: 0; color: inherit;" onclick="showPage('homePage')">
+                  <img src="./img2/Group 6.png" alt="Home" class="home-icon" />
+                  <div>Home</div>
+                </button>
+            </div>
+            <div class="divider1">
+              <img src="./img2/Line 4.png" alt="" class="divider1" />
+            </div>
+            <div class="result-details">
+                <div class="result-icon"></div>
+                <button style="background: transparent; border: none; padding: 0; color: inherit;" onclick="showPage('infoPage')">
+                  <img src="./img2/公共交通.png" alt="Information" class="information-icon" />
+                  <div>Information</div>
+                </button>
+            </div>
+            <div class="divider2">
+              <img src="./img2/Line 4.png" alt="" class="divider2" />
+            </div>
+            <div class="result-details">
+                <div class="result-icon"></div>
+                <button style="background: transparent; border: none; padding: 0; color: inherit;" onclick="showPage('messagePage')">
+                  <img src="./img2/信息.png" alt="Message" class="message-icon" />
+                  <div>Message</div>
+                </button>
+            </div>
+            <div class="divider3">
+              <img src="./img2/Line 4.png" alt="" class="divider3" />
+            </div>
+            <div class="result-details">
+                <div class="result-icon"></div>
+                <button style="background: transparent; border: none; padding: 0; color: inherit;" onclick="showPage('favoritePage')">
+                  <img src="./img2/Star 1.png" alt="Favorite" class="favorite-icon" />
+                  <div>Favorite</div>
+                </button>
+            </div>
+          </div>
+    </div>
+
+    <div id="loginbox" class="usel-loginbox">
+        <div class="user">  
+            <img src="./img2/KHCFDC_头像 2.png" alt="user" class="user" onclick="showPage('minePage')"> 
+        </div>
+    </div>
+    <aside class="sidebar-icon-container">
+        <div class="sidebar-icon-wrapper">
+          <img src="./img2/定位.png" alt="" class="sidebar-icon" />
+        </div>
+    </aside>
+
+    <div class="small-icon-container">
+        <img loading="lazy" src="./img2/Rectangle 8.png" class="small-icon" alt="Small icon">
+    </div>
+    <script>
+        function showPage(pageId) {
+            const pages = document.querySelectorAll('.page-content');
+            const loginbox = document.getElementById('loginbox');
+            
+            if (pageId === 'minePage') {
+                const minePage = document.getElementById('minePage');
+                if (minePage.style.display === 'none' || !minePage.style.display) {
+                    minePage.style.display = 'block';
+                    setTimeout(() => {
+                        minePage.classList.add('active');
+                        loginbox.style.display = 'none'; // 隐藏用户头像
+                    }, 10);
+                } else {
+                    minePage.classList.remove('active');
+                    setTimeout(() => {
+                        minePage.style.display = 'none';
+                        loginbox.style.display = 'block'; // 显示用户头像
+                    }, 300);
+                }
+                return;
+            }
+
+            // 处理其他页面的切换
+            pages.forEach(page => {
+                if (page.id === 'minePage') return;
+                if (page.id === pageId) {
+                    page.style.display = 'block';
+                    if (pageId === 'favoritePage') {
+                        page.style.marginTop = '175px';
+                    }
+                } else {
+                    page.style.display = 'none';
+                }
+            });
+        }
+
+        // 显示子页面
+        function showSubPage(pageId) {
+            const subPage = document.getElementById(pageId);
+            if (subPage) {
+                subPage.style.display = 'block';
+                setTimeout(() => {
+                    subPage.classList.add('active');
+                }, 10);
+            }
+        }
+
+        // 隐藏子页面
+        function hideSubPage(pageId) {
+            const subPage = document.getElementById(pageId);
+            if (subPage) {
+                subPage.classList.remove('active');
+                setTimeout(() => {
+                    subPage.style.display = 'none';
+                }, 300);
+            }
+        }
+
+        // 点击页面其他区域关闭Mine页面和所有子页面
+        document.addEventListener('click', function(event) {
+            const minePage = document.getElementById('minePage');
+            const loginbox = document.querySelector('.usel-loginbox');
+            const subPages = document.querySelectorAll('.sub-page');
+            
+            // 如果Mine页面是打开的，且点击不是在Mine页面内部或用户头像上
+            if (minePage.style.display === 'block' && 
+                !minePage.contains(event.target) && 
+                !loginbox.contains(event.target)) {
+                showPage('minePage');
+                
+                // 同时关闭所有子页面
+                subPages.forEach(page => {
+                    if (page.classList.contains('active')) {
+                        hideSubPage(page.id);
+                    }
+                });
+            }
+        });
+
+        // 阻止子页面的点击事件冒泡
+        document.querySelectorAll('.sub-page').forEach(page => {
+            page.addEventListener('click', function(event) {
+                event.stopPropagation();
+            });
+        });
+
+        // 阻止Mine页面的点击事件冒泡
+        document.getElementById('minePage').addEventListener('click', function(event) {
+            event.stopPropagation();
+        });
+    </script>
+</body>
+</html>

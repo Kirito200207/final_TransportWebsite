@@ -1,0 +1,108 @@
+version: '3.8'
+
+services:
+  # Backend service
+  backend:
+    build: 
+      context: ./transit_backend
+      dockerfile: Dockerfile
+    container_name: transit_backend
+    restart: always
+    volumes:
+      - static_volume:/app/static
+      - media_volume:/app/media
+    environment:
+      - DEBUG=False
+      - SECRET_KEY=your-production-secret-key-here
+      - ALLOWED_HOSTS=yourdomain.com,www.yourdomain.com
+      - DB_ENGINE=django.db.backends.postgresql
+      - DB_NAME=transit_prod
+      - DB_USER=postgres
+      - DB_PASSWORD=secure-password-here
+      - DB_HOST=db
+      - DB_PORT=5432
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - REDIS_DB=0
+      - REDIS_PASSWORD=secure-redis-password
+      - CORS_ALLOWED_ORIGINS=https://yourdomain.com,https://www.yourdomain.com
+      - EMAIL_BACKEND=django.core.mail.backends.smtp.EmailBackend
+      - EMAIL_HOST=smtp.yourdomain.com
+      - EMAIL_PORT=587
+      - EMAIL_USE_TLS=True
+      - EMAIL_HOST_USER=noreply@yourdomain.com
+      - EMAIL_HOST_PASSWORD=your-email-password
+      - DEFAULT_FROM_EMAIL=noreply@yourdomain.com
+    depends_on:
+      - db
+      - redis
+    networks:
+      - transit_network
+    command: gunicorn --bind 0.0.0.0:8000 --workers 4 transit_backend.wsgi:application
+
+  # Frontend service
+  frontend:
+    build: 
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: transit_frontend
+    restart: always
+    environment:
+      - REACT_APP_API_URL=https://yourdomain.com/api
+      - REACT_APP_DEBUG=false
+    networks:
+      - transit_network
+
+  # Database service
+  db:
+    image: postgres:14-alpine
+    container_name: transit_db
+    restart: always
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    environment:
+      - POSTGRES_DB=transit_prod
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=secure-password-here
+    networks:
+      - transit_network
+
+  # Redis service
+  redis:
+    image: redis:7-alpine
+    container_name: transit_redis
+    restart: always
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes --requirepass secure-redis-password
+    networks:
+      - transit_network
+
+  # Nginx service
+  nginx:
+    image: nginx:1.23-alpine
+    container_name: transit_nginx
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - static_volume:/static
+      - media_volume:/media
+      - ./nginx/certs:/etc/nginx/certs:ro
+    depends_on:
+      - backend
+      - frontend
+    networks:
+      - transit_network
+
+networks:
+  transit_network:
+    driver: bridge
+
+volumes:
+  postgres_data:
+  redis_data:
+  static_volume:
+  media_volume: 

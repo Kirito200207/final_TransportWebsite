@@ -1,0 +1,95 @@
+version: '3.8'
+
+services:
+  # Backend service
+  backend:
+    image: python:3.9-slim
+    container_name: transit_backend
+    restart: always
+    volumes:
+      - ./transit_backend:/app
+      - static_volume:/app/static
+      - media_volume:/app/media
+    working_dir: /app
+    command: >
+      sh -c "pip install -r requirements.txt &&
+             python manage.py migrate &&
+             python manage.py runserver 0.0.0.0:8000"
+    environment:
+      - DEBUG=True
+      - SECRET_KEY=django-insecure-dev-key-change-this-in-production
+      - ALLOWED_HOSTS=localhost,127.0.0.1
+      - DB_ENGINE=django.db.backends.postgresql
+      - DB_NAME=transit_dev
+      - DB_USER=postgres
+      - DB_PASSWORD=postgres
+      - DB_HOST=db
+      - DB_PORT=5432
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - REDIS_DB=0
+      - CORS_ALLOWED_ORIGINS=http://localhost,http://127.0.0.1
+      - EMAIL_BACKEND=django.core.mail.backends.console.EmailBackend
+    depends_on:
+      - db
+      - redis
+    networks:
+      - transit_network
+    ports:
+      - "8000:8000"
+
+  # Frontend service
+  frontend:
+    image: node:20-alpine
+    container_name: transit_frontend
+    restart: always
+    volumes:
+      - ./my-transport-app:/app
+      - /app/node_modules
+    working_dir: /app
+    command: >
+      sh -c "npm install && 
+             npm start"
+    environment:
+      - REACT_APP_API_URL=http://localhost:8000/api
+      - REACT_APP_DEBUG=true
+    networks:
+      - transit_network
+    ports:
+      - "3000:3000"
+
+  # Database service
+  db:
+    image: postgres:14-alpine
+    container_name: transit_db
+    restart: always
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    environment:
+      - POSTGRES_DB=transit_dev
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    networks:
+      - transit_network
+
+  # Redis service
+  redis:
+    image: redis:7-alpine
+    container_name: transit_redis
+    restart: always
+    volumes:
+      - redis_data:/data
+    networks:
+      - transit_network
+
+
+
+networks:
+  transit_network:
+    driver: bridge
+
+volumes:
+  postgres_data:
+  redis_data:
+  static_volume:
+  media_volume: 
