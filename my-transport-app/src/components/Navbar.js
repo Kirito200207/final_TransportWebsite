@@ -15,29 +15,21 @@ const Navbar = ({ activePage, onNavClick, isPageVisible }) => {
     { id: 'setting', icon: faCog, label: 'Settings' },
   ];
   
-  const handleKeyDown = (id, e) => {
-    if (e.key === 'Enter' || e.key === ' ') {
-      onNavClick(id);
-    }
-  };
-  
   return (
     <nav className="navbar">
-      <ul>
+      <div className="nav-items-container">
         {navItems.map(item => (
-          <li 
+          <button 
             key={item.id}
             className={`nav-item ${activePage === item.id ? 'active' : ''} ${activePage === item.id && isPageVisible ? 'expanded' : ''}`}
             onClick={() => onNavClick(item.id)}
-            onKeyDown={(e) => handleKeyDown(item.id, e)}
-            role="button"
-            tabIndex={0}
+            type="button"
           >
             <FontAwesomeIcon icon={item.icon} />
             <span className="nav-label">{item.label}</span>
-          </li>
+          </button>
         ))}
-      </ul>
+      </div>
     </nav>
   );
 };

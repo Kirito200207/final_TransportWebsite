@@ -9,6 +9,7 @@ redis>=6.0.0
 gunicorn>=21.2.0
 whitenoise>=6.6.0
 python-dotenv>=1.0.0
+drf-yasg>=1.21.0
 # Testing tools
 pytest>=7.4.3
 pytest-django>=4.7.0

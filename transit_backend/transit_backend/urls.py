@@ -15,9 +15,25 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path, include
+from django.urls import path, include, re_path
 from django.views.generic import RedirectView
 from django.http import HttpResponse
+from rest_framework import permissions
+from drf_yasg.views import get_schema_view
+from drf_yasg import openapi
+
+schema_view = get_schema_view(
+    openapi.Info(
+        title="Public Transit API",
+        default_version='v1',
+        description="API documentation for the Public Transit System",
+        terms_of_service="https://www.example.com/terms/",
+        contact=openapi.Contact(email="contact@example.com"),
+        license=openapi.License(name="MIT License"),
+    ),
+    public=True,
+    permission_classes=[permissions.AllowAny],
+)
 
 def api_root(request):
     html_content = """
@@ -60,6 +76,8 @@ def api_root(request):
         <ul>
             <li><a href="/admin/">Admin Interface</a> - Manage data and users</li>
             <li><a href="/api/">API Endpoints</a> - Access the API directly</li>
+            <li><a href="/swagger/">API Documentation (Swagger)</a> - Interactive API documentation</li>
+            <li><a href="/redoc/">API Documentation (ReDoc)</a> - Alternative API documentation</li>
         </ul>
     </body>
     </html>
@@ -70,4 +88,9 @@ urlpatterns = [
     path('', api_root, name='api_root'),
     path('admin/', admin.site.urls),
     path('api/', include('api.urls')),
+    
+    # Swagger documentation
+    re_path(r'^swagger(?P<format>\.json|\.yaml)$', schema_view.without_ui(cache_timeout=0), name='schema-json'),
+    path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
+    path('redoc/', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
 ]

@@ -119,10 +119,17 @@ const AccountSecurityPage = ({ isActive, onClose }) => {
               <span className="setting-description">Use mobile verification code for two-factor authentication</span>
             </div>
             <div className="setting-toggle">
-              <label className="switch" htmlFor="twoFactorAuth">
-                <input type="checkbox" id="twoFactorAuth" />
-                <span className="slider round"></span>
-              </label>
+              <div className="toggle-wrapper">
+                <input 
+                  type="checkbox" 
+                  id="twoFactorAuth"
+                  aria-label="Enable two-factor authentication" 
+                />
+                <label htmlFor="twoFactorAuth" className="switch">
+                  <span className="sr-only">Enable two-factor authentication</span>
+                  <span className="slider round"></span>
+                </label>
+              </div>
             </div>
           </div>
 
@@ -132,10 +139,18 @@ const AccountSecurityPage = ({ isActive, onClose }) => {
               <span className="setting-description">Send email notification when logging in from a new device</span>
             </div>
             <div className="setting-toggle">
-              <label className="switch" htmlFor="loginNotifications">
-                <input type="checkbox" id="loginNotifications" defaultChecked />
-                <span className="slider round"></span>
-              </label>
+              <div className="toggle-wrapper">
+                <input 
+                  type="checkbox" 
+                  id="loginNotifications" 
+                  defaultChecked
+                  aria-label="Enable login notifications" 
+                />
+                <label htmlFor="loginNotifications" className="switch">
+                  <span className="sr-only">Enable login notifications</span>
+                  <span className="slider round"></span>
+                </label>
+              </div>
             </div>
           </div>
         </div>

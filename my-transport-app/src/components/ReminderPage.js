@@ -254,10 +254,11 @@ const ReminderPage = ({ isActive, onClose }) => {
             <h3 className="section-title">{editingReminderId ? 'Edit Reminder' : 'Add New Reminder'}</h3>
             <form onSubmit={handleSubmit} className="reminder-form">
               <div className="form-group">
-                <label>
+                <label htmlFor="title">
                   <FontAwesomeIcon icon={faBell} /> Title:
                   <input
                     type="text"
+                    id="title"
                     name="title"
                     value={newReminder.title}
                     onChange={handleInputChange}
@@ -267,9 +268,10 @@ const ReminderPage = ({ isActive, onClose }) => {
                 </label>
               </div>
               <div className="form-group">
-                <label>
+                <label htmlFor="description">
                   <FontAwesomeIcon icon={faEdit} /> Description (optional):
                   <textarea
+                    id="description"
                     name="description"
                     value={newReminder.description}
                     onChange={handleInputChange}
@@ -279,9 +281,10 @@ const ReminderPage = ({ isActive, onClose }) => {
               </div>
               <div className="form-row">
                 <div className="form-group">
-                  <label>
+                  <label htmlFor="route">
                     <FontAwesomeIcon icon={faRoute} /> Route (optional):
                     <select
+                      id="route"
                       name="route"
                       value={newReminder.route}
                       onChange={handleInputChange}
@@ -298,9 +301,10 @@ const ReminderPage = ({ isActive, onClose }) => {
               </div>
               <div className="form-row">
                 <div className="form-group">
-                  <label>
+                  <label htmlFor="from_stop">
                     <FontAwesomeIcon icon={faMapMarkerAlt} /> From (optional):
                     <select
+                      id="from_stop"
                       name="from_stop"
                       value={newReminder.from_stop}
                       onChange={handleInputChange}
@@ -315,9 +319,10 @@ const ReminderPage = ({ isActive, onClose }) => {
                   </label>
                 </div>
                 <div className="form-group">
-                  <label>
+                  <label htmlFor="to_stop">
                     <FontAwesomeIcon icon={faMapMarkerAlt} /> To (optional):
                     <select
+                      id="to_stop"
                       name="to_stop"
                       value={newReminder.to_stop}
                       onChange={handleInputChange}
@@ -334,9 +339,10 @@ const ReminderPage = ({ isActive, onClose }) => {
               </div>
               <div className="form-row">
                 <div className="form-group">
-                  <label>
+                  <label htmlFor="reminder_time">
                     <FontAwesomeIcon icon={faCalendarAlt} /> Reminder Time:
                     <DatePicker
+                      id="reminder_time"
                       selected={newReminder.reminder_time}
                       onChange={handleDateChange}
                       showTimeSelect
@@ -348,10 +354,11 @@ const ReminderPage = ({ isActive, onClose }) => {
                   </label>
                 </div>
                 <div className="form-group">
-                  <label>
+                  <label htmlFor="advance_notice">
                     <FontAwesomeIcon icon={faClock} /> Advance Notice (minutes):
                     <input
                       type="number"
+                      id="advance_notice"
                       name="advance_notice"
                       value={newReminder.advance_notice}
                       onChange={handleInputChange}
@@ -363,9 +370,10 @@ const ReminderPage = ({ isActive, onClose }) => {
               </div>
               <div className="form-row">
                 <div className="form-group">
-                  <label>
+                  <label htmlFor="repeat_type">
                     <FontAwesomeIcon icon={faCalendarAlt} /> Repeat Type:
                     <select
+                      id="repeat_type"
                       name="repeat_type"
                       value={newReminder.repeat_type}
                       onChange={handleInputChange}
@@ -381,11 +389,11 @@ const ReminderPage = ({ isActive, onClose }) => {
                 </div>
                 {newReminder.repeat_type === 'weekly' && (
                   <div className="form-group">
-                    <label htmlFor="repeatDays">
+                    <label htmlFor="repeat_days">
                       <FontAwesomeIcon icon={faCalendarAlt} /> Repeat Days:
                       <input
                         type="text"
-                        id="repeatDays"
+                        id="repeat_days"
                         name="repeat_days"
                         value={newReminder.repeat_days}
                         onChange={handleInputChange}
