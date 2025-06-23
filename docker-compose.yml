@@ -3,7 +3,7 @@ version: '3.8'
 services:
   # Backend service
   backend:
-    image: python:3.9-slim
+    build: ./transit_backend
     container_name: transit_backend
     restart: always
     volumes:
@@ -11,10 +11,6 @@ services:
       - static_volume:/app/static
       - media_volume:/app/media
     working_dir: /app
-    command: >
-      sh -c "pip install -r requirements.txt &&
-             python manage.py migrate &&
-             python manage.py runserver 0.0.0.0:8000"
     environment:
       - DEBUG=True
       - SECRET_KEY=django-insecure-dev-key-change-this-in-production
@@ -40,16 +36,13 @@ services:
 
   # Frontend service
   frontend:
-    image: node:20-alpine
+    build: ./my-transport-app
     container_name: transit_frontend
     restart: always
     volumes:
       - ./my-transport-app:/app
       - /app/node_modules
     working_dir: /app
-    command: >
-      sh -c "npm install && 
-             npm start"
     environment:
       - REACT_APP_API_URL=http://localhost:8000/api
       - REACT_APP_DEBUG=true
@@ -82,8 +75,6 @@ services:
     networks:
       - transit_network
 
-
-
 networks:
   transit_network:
     driver: bridge
@@ -92,4 +83,4 @@ volumes:
   postgres_data:
   redis_data:
   static_volume:
-  media_volume: 
+  media_volume:
